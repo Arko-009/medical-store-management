@@ -89,6 +89,7 @@ function Dashboard() {
     fetchStoresData();
     fetchProductsData();
     fetchMonthlySalesData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetching total sales amount (FIXED)
