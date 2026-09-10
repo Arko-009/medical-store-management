@@ -8,14 +8,19 @@ const salesRoute = require("./router/sales");
 const cors = require("cors");
 const User = require("./models/users");
 
-const Product = require("./models/Product");
+const Product = require("./models/product");
 
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-main();
 app.use(express.json());
 app.use(cors());
+
+// Ensure database connection in serverless environment
+app.use(async (req, res, next) => {
+  await main();
+  next();
+});
 
 app.get("/", (req, res) => {
   res.send("Medical Store Management API is running");
@@ -90,9 +95,11 @@ app.get("/testget", async (req,res)=>{
 
 })
 
-// Here we are listening to the server
-app.listen(PORT, () => {
-  console.log("I am live again");
-});
+// Only listen locally, Vercel handles serverless invocation
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = app;
