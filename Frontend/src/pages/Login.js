@@ -1,7 +1,7 @@
-// import { LockClosedIcon } from "@heroicons/react/20/solid";
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../AuthContext";
+import { API_URL } from "../config";
 
 function Login() {
   const [form, setForm] = useState({
@@ -12,49 +12,41 @@ function Login() {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const authCheck = () => {
-    setTimeout(() => {
-      fetch("http://localhost:4000/api/login")
-        .then((response) => response.json())
-        .then((data) => {
-          alert("Successfully Login");
-          localStorage.setItem("user", JSON.stringify(data));
-          authContext.signin(data._id, () => {
-            navigate("/");
-          });
-        })
-        .catch((err) => {
-          alert("Wrong credentials, Try again")
-          console.log(err);
-        });
-    }, 3000);
-  };
-
   const loginUser = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     // Cannot send empty data
     if (form.email === "" || form.password === "") {
       alert("To login user, enter details to proceed...");
-    } else {
-      fetch("http://localhost:4000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(form),
-      })
-        .then((result) => {
-          console.log("User login", result);
-        })
-        .catch((error) => {
-          console.log("Something went wrong ", error);
-        });
+      return;
     }
-    authCheck();
+    fetch(`${API_URL}/api/login`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(form),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Invalid Credentials");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert("Successfully Login");
+        localStorage.setItem("user", JSON.stringify(data));
+        authContext.signin(data._id, () => {
+          navigate("/");
+        });
+      })
+      .catch((error) => {
+        alert("Wrong credentials, Try again");
+        console.log("Login error: ", error);
+      });
   };
 
 

@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { API_URL } from "../config";
 
 export default function AddSale({ closeModal, refreshSales }) {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user")) || {};
 
 const [sale, setSale] = useState({
-  userID: user._id,
+  userID: user._id || "",
   ProductID: "",
   StoreID: "",
   StockSold: "",
@@ -17,7 +18,7 @@ const [sale, setSale] = useState({
   };
 
   const addSale = async () => {
-    await fetch("http://localhost:4000/api/sales/add", {
+    await fetch(`${API_URL}/api/sales/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(sale),

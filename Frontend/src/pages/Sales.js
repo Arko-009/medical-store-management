@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AddSale from "../components/AddSale";
+import { API_URL } from "../config";
 
 function Sales() {
   const [sales, setSales] = useState([]);
@@ -11,7 +12,7 @@ function Sales() {
       if (!user?._id) return;
 
       const res = await fetch(
-        `http://localhost:4000/api/sales/user/${user._id}`
+        `${API_URL}/api/sales/user/${user._id}`
       );
       const data = await res.json();
       setSales(data);

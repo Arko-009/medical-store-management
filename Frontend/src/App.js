@@ -17,19 +17,21 @@ import PurchaseDetails from "./pages/PurchaseDetails";
 const App = () => {
   const [user, setUser] = useState("");
   const [loader, setLoader] = useState(true);
-  let myLoginUser = JSON.parse(localStorage.getItem("user"));
-  // console.log("USER: ",user)
 
   useEffect(() => {
-    if (myLoginUser) {
-      setUser(myLoginUser._id);
-      setLoader(false);
-      // console.log("inside effect", myLoginUser)
-    } else {
+    try {
+      const myLoginUser = JSON.parse(localStorage.getItem("user"));
+      if (myLoginUser && myLoginUser._id) {
+        setUser(myLoginUser._id);
+      } else {
+        setUser("");
+      }
+    } catch (err) {
+      console.error(err);
       setUser("");
-      setLoader(false);
     }
-  }, [myLoginUser]);
+    setLoader(false);
+  }, []);
 
   const signin = (newUser, callback) => {
     setUser(newUser);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AddStore from "../components/AddStore";
+import { API_URL } from "../config";
 
 function Store() {
   const [stores, setStores] = useState([]);
@@ -15,7 +16,7 @@ function Store() {
       }
 
       const res = await fetch(
-        `http://localhost:4000/api/store/user/${user._id}`
+        `${API_URL}/api/store/user/${user._id}`
       );
       const data = await res.json();
       console.log("STORES FROM API:", data);

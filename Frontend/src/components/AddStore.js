@@ -3,6 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import UploadImage from "./UploadImage";
 import AuthContext from "../AuthContext";
+import { API_URL } from "../config";
 
 export default function AddStore({ onStoreAdded }) {
   const authContext = useContext(AuthContext);
@@ -28,7 +29,7 @@ export default function AddStore({ onStoreAdded }) {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:4000/api/store/add", {
+      const res = await fetch(`${API_URL}/api/store/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
