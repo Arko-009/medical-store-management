@@ -72,24 +72,35 @@ export default function Header() {
                           leaveFrom="transform opacity-100 scale-100"
                           leaveTo="transform opacity-0 scale-95"
                         >
-                          <Menu.Items className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {userNavigation.map((item) => (
-                              <Menu.Item key={item.name}>
-                                {({ active }) => (
-                                  <Link
-                                    to={item.href}
-                                    className={classNames(
-                                      active ? "bg-gray-100" : "",
-                                      "block px-4 py-2 text-sm text-gray-700"
-                                    )}
-                                  >
-                                    <span onClick={() => authContext.signout()}>
-                                      {item.name}{" "}
-                                    </span>
-                                  </Link>
-                                )}
-                              </Menu.Item>
-                            ))}
+                          <Menu.Items className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
+                            <div className="px-4 py-2.5">
+                              <p className="text-xs font-semibold text-gray-900 truncate">
+                                {((localStorageData.firstName || "") +
+                                  " " +
+                                  (localStorageData.lastName || "")).trim() || "User"}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate mt-0.5">
+                                {localStorageData.email || ""}
+                              </p>
+                            </div>
+                            <div className="py-1">
+                              {userNavigation.map((item) => (
+                                <Menu.Item key={item.name}>
+                                  {({ active }) => (
+                                    <Link
+                                      to={item.href}
+                                      className={classNames(
+                                        active ? "bg-gray-50 text-gray-900" : "text-gray-700",
+                                        "block px-4 py-2 text-sm font-medium transition-colors"
+                                      )}
+                                      onClick={() => authContext.signout()}
+                                    >
+                                      {item.name}
+                                    </Link>
+                                  )}
+                                </Menu.Item>
+                              ))}
+                            </div>
                           </Menu.Items>
                         </Transition>
                       </Menu>

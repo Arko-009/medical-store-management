@@ -6,32 +6,6 @@ import { API_URL } from "../config";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-export const data = {
-  labels: ["Apple", "Knorr", "Shoop", "Green", "Purple", "Orange"],
-  datasets: [
-    {
-      label: "# of Votes",
-      data: [0, 1, 5, 8, 9, 15],
-      backgroundColor: [
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
-        "rgba(255, 206, 86, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
-        "rgba(153, 102, 255, 0.2)",
-        "rgba(255, 159, 64, 0.2)",
-      ],
-      borderColor: [
-        "rgba(255, 99, 132, 1)",
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(153, 102, 255, 1)",
-        "rgba(255, 159, 64, 1)",
-      ],
-      borderWidth: 1,
-    },
-  ],
-};
 
 function Dashboard() {
   const [saleAmount, setSaleAmount] = useState("");
@@ -43,6 +17,24 @@ function Dashboard() {
     options: {
       chart: {
         id: "basic-bar",
+        toolbar: {
+          show: false,
+        },
+        fontFamily: "inherit",
+      },
+      colors: ["#2563eb"],
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          columnWidth: "42%",
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      grid: {
+        borderColor: "#f1f5f9",
+        strokeDashArray: 4,
       },
       xaxis: {
         categories: [
@@ -59,11 +51,26 @@ function Dashboard() {
           "Nov",
           "Dec",
         ],
+        labels: {
+          style: {
+            colors: "#64748b",
+            fontSize: "12px",
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: "#64748b",
+            fontSize: "12px",
+          },
+          formatter: (val) => `$${val}`,
+        },
       },
     },
     series: [
       {
-        name: "series",
+        name: "Monthly Sales Amount",
         data: [10, 20, 40, 50, 60, 20, 10, 35, 45, 70, 25, 70],
       },
     ],
@@ -71,15 +78,15 @@ function Dashboard() {
 
   // Update Chart Data
   const updateChartData = (salesData) => {
-    setChart({
-      ...chart,
+    setChart((prevChart) => ({
+      ...prevChart,
       series: [
         {
           name: "Monthly Sales Amount",
           data: [...salesData],
         },
       ],
-    });
+    }));
   };
 
   const authContext = useContext(AuthContext);
@@ -94,17 +101,18 @@ function Dashboard() {
   }, []);
 
   // Fetching total sales amount (FIXED)
-const fetchTotalSaleAmount = () => {
-  fetch(`${API_URL}/api/sales/user/${authContext.user}`)
-    .then((response) => response.json())
-    .then((datas) => {
-      const total = datas.reduce(
-        (sum, sale) => sum + Number(sale.TotalSaleAmount || 0),
-        0
-      );
-      setSaleAmount(total);
-    });
-};
+  const fetchTotalSaleAmount = () => {
+    fetch(`${API_URL}/api/sales/user/${authContext.user}`)
+      .then((response) => response.json())
+      .then((datas) => {
+        const total = datas.reduce(
+          (sum, sale) => sum + Number(sale.TotalSaleAmount || 0),
+          0
+        );
+        setSaleAmount(total);
+      })
+      .catch((err) => console.log(err));
+  };
 
   // Fetching total purchase amount
   const fetchTotalPurchaseAmount = () => {
@@ -112,14 +120,16 @@ const fetchTotalSaleAmount = () => {
       `${API_URL}/api/purchase/get/${authContext.user}/totalpurchaseamount`
     )
       .then((response) => response.json())
-      .then((datas) => setPurchaseAmount(datas.totalPurchaseAmount));
+      .then((datas) => setPurchaseAmount(datas.totalPurchaseAmount))
+      .catch((err) => console.log(err));
   };
 
   // Fetching all stores data
   const fetchStoresData = () => {
     fetch(`${API_URL}/api/store/user/${authContext.user}`)
       .then((response) => response.json())
-      .then((datas) => setStores(datas));
+      .then((datas) => setStores(datas))
+      .catch((err) => console.log(err));
   };
 
   // Fetching Data of All Products
@@ -138,164 +148,215 @@ const fetchTotalSaleAmount = () => {
       .catch((err) => console.log(err));
   };
 
+  // Dynamic distribution from existing products data
+  const manufacturerCounts = {};
+  products.forEach((p) => {
+    const key = p.manufacturer?.trim() || "General Medicine";
+    manufacturerCounts[key] =
+      (manufacturerCounts[key] || 0) + (Number(p.stock) || 1);
+  });
+
+  const manufacturerKeys = Object.keys(manufacturerCounts);
+  const donutLabels =
+    manufacturerKeys.length > 0
+      ? manufacturerKeys.slice(0, 6)
+      : ["Tablets", "Syrups", "Injections", "Capsules", "Topical", "Other"];
+  const donutDataValues =
+    manufacturerKeys.length > 0
+      ? donutLabels.map((k) => manufacturerCounts[k])
+      : [35, 25, 15, 12, 8, 5];
+
+  const donutChartData = {
+    labels: donutLabels,
+    datasets: [
+      {
+        label: "Units in Stock",
+        data: donutDataValues,
+        backgroundColor: [
+          "#2563eb",
+          "#10b981",
+          "#f59e0b",
+          "#8b5cf6",
+          "#ec4899",
+          "#06b6d4",
+        ],
+        borderWidth: 2,
+        borderColor: "#ffffff",
+      },
+    ],
+  };
+
+  const donutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          boxWidth: 10,
+          boxHeight: 10,
+          padding: 14,
+          font: {
+            size: 11,
+          },
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => ` ${context.label}: ${context.raw} units`,
+        },
+      },
+    },
+    cutout: "68%",
+  };
+
   return (
-    <>
-      <div className="grid grid-cols-1 col-span-12 lg:col-span-10 gap-6 md:grid-cols-3 lg:grid-cols-4  p-4 ">
-        <article className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
-          <div className="inline-flex gap-2 self-end rounded bg-green-100 p-1 text-green-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-              />
-            </svg>
-
-            <span className="text-xs font-medium"> 67.81% </span>
-          </div>
-
+    <div className="col-span-12 lg:col-span-10 min-h-screen bg-gray-50/60 p-5 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6 lg:space-y-8">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <strong className="block text-sm font-medium text-gray-500">
-              Sales
-            </strong>
-
-            <p>
-              <span className="text-2xl font-medium text-gray-900">
-                ${saleAmount}
-              </span>
-
-              <span className="text-xs text-gray-500"> from $240.94 </span>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              Dashboard Overview
+            </h1>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Live performance metrics and inventory status for your pharmacy.
             </p>
           </div>
-        </article>
-
-        <article className="flex flex-col  gap-4 rounded-lg border border-gray-100 bg-white p-6 ">
-          <div className="inline-flex gap-2 self-end rounded bg-red-100 p-1 text-red-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
-              />
-            </svg>
-
-            <span className="text-xs font-medium"> 67.81% </span>
+          <div className="inline-flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-medium text-gray-600 shadow-xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            Live Sync Active
           </div>
+        </div>
 
-          <div>
-            <strong className="block text-sm font-medium text-gray-500">
-              Purchase
-            </strong>
-
-            <p>
-              <span className="text-2xl font-medium text-gray-900">
-                {" "}
-                ${purchaseAmount}{" "}
+        {/* KPI Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {/* Card 1: Sales */}
+          <article className="rounded-xl border border-gray-200/80 bg-white p-5 shadow-xs hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Total Sales
               </span>
-
-              <span className="text-xs text-gray-500"> from $404.32 </span>
-            </p>
-          </div>
-        </article>
-        <article className="flex flex-col   gap-4 rounded-lg border border-gray-100 bg-white p-6 ">
-          <div className="inline-flex gap-2 self-end rounded bg-red-100 p-1 text-red-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
-              />
-            </svg>
-
-            <span className="text-xs font-medium"> 67.81% </span>
-          </div>
-
-          <div>
-            <strong className="block text-sm font-medium text-gray-500">
-              Total Medicines
-            </strong>
-
-            <p>
-              <span className="text-2xl font-medium text-gray-900">
-                {" "}
-                {products.length}{" "}
+              <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-600/10">
+                Revenue
               </span>
+            </div>
+            <div className="mt-3">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                ${saleAmount || 0}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Total recorded customer transactions
+              </p>
+            </div>
+          </article>
 
-              {/* <span className="text-xs text-gray-500"> from $404.32 </span> */}
-            </p>
-          </div>
-        </article>
-        <article className="flex flex-col   gap-4 rounded-lg border border-gray-100 bg-white p-6 ">
-          <div className="inline-flex gap-2 self-end rounded bg-red-100 p-1 text-red-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
-              />
-            </svg>
-
-            <span className="text-xs font-medium"> 67.81% </span>
-          </div>
-
-          <div>
-            <strong className="block text-sm font-medium text-gray-500">
-              Total Stores
-            </strong>
-
-            <p>
-              <span className="text-2xl font-medium text-gray-900">
-                {" "}
-                {stores.length}{" "}
+          {/* Card 2: Purchases */}
+          <article className="rounded-xl border border-gray-200/80 bg-white p-5 shadow-xs hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Purchases
               </span>
+              <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-blue-700/10">
+                Procurement
+              </span>
+            </div>
+            <div className="mt-3">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                ${purchaseAmount || 0}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Total expenditure on medicine stock
+              </p>
+            </div>
+          </article>
 
-              {/* <span className="text-xs text-gray-500"> from 0 </span> */}
-            </p>
+          {/* Card 3: Total Medicines */}
+          <article className="rounded-xl border border-gray-200/80 bg-white p-5 shadow-xs hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Total Medicines
+              </span>
+              <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700 ring-1 ring-purple-700/10">
+                Catalog
+              </span>
+            </div>
+            <div className="mt-3">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                {products.length}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Active medicine products registered
+              </p>
+            </div>
+          </article>
+
+          {/* Card 4: Total Stores */}
+          <article className="rounded-xl border border-gray-200/80 bg-white p-5 shadow-xs hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Total Stores
+              </span>
+              <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-700/10">
+                Retail Outlets
+              </span>
+            </div>
+            <div className="mt-3">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                {stores.length}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Operating pharmacy branches
+              </p>
+            </div>
+          </article>
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Bar Chart: Monthly Sales */}
+          <div className="lg:col-span-7 rounded-xl border border-gray-200/80 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-gray-900">
+                  Monthly Sales Revenue
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Monthly sales distribution over the calendar year
+                </p>
+              </div>
+              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
+                Current Year
+              </span>
+            </div>
+            <div className="w-full">
+              <Chart
+                options={chart.options}
+                series={chart.series}
+                type="bar"
+                width="100%"
+                height={300}
+              />
+            </div>
           </div>
-        </article>
-        <div className="flex justify-around bg-white rounded-lg py-8 col-span-full justify-center">
-          <div>
-            <Chart
-              options={chart.options}
-              series={chart.series}
-              type="bar"
-              width="500"
-            />
-          </div>
-          <div>
-            <Doughnut data={data} />
+
+          {/* Donut Chart: Inventory by Manufacturer */}
+          <div className="lg:col-span-5 rounded-xl border border-gray-200/80 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+            <div className="border-b border-gray-100 pb-4 mb-4">
+              <h2 className="text-base font-semibold text-gray-900">
+                Inventory Breakdown
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Distribution of medicine stock by manufacturer
+              </p>
+            </div>
+            <div className="h-[280px] sm:h-[300px] w-full flex items-center justify-center">
+              <Doughnut data={donutChartData} options={donutOptions} />
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
