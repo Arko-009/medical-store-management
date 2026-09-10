@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const { main } = require("./models/index");
 const productRoute = require("./router/product");
@@ -11,10 +12,14 @@ const Product = require("./models/Product");
 
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 main();
 app.use(express.json());
 app.use(cors());
+
+app.get("/", (req, res) => {
+  res.send("Medical Store Management API is running");
+});
 
 // Store API
 app.use("/api/store", storeRoute);
@@ -73,7 +78,6 @@ app.post("/api/register", (req, res) => {
     .save()
     .then((result) => {
       res.status(200).send(result);
-      alert("Signup Successfull");
     })
     .catch((err) => console.log("Signup: ", err));
   console.log("request: ", req.body);
@@ -90,3 +94,5 @@ app.get("/testget", async (req,res)=>{
 app.listen(PORT, () => {
   console.log("I am live again");
 });
+
+module.exports = app;

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-const uri = "mongodb+srv://arkobag712409:8H4XiT373RVx3xdg@cluster0.8lvaz.mongodb.net/storemanagement";
+const uri =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://arkobag712409:8H4XiT373RVx3xdg@cluster0.8lvaz.mongodb.net/storemanagement";
 
 
 function main() {
