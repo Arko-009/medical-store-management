@@ -73,7 +73,7 @@ PharmaCare resolves these issues through automated, bidirectional stock synchron
 
 <!-- SCREENSHOT 1: DASHBOARD OVERVIEW -->
 <p align="center">
-  <img src="https://via.placeholder.com/1200x630/1e293b/ffffff?text=+Preview%3A+PharmaCare+Analytics+Dashboard" alt="PharmaCare Dashboard Overview" width="92%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+  <img src="./Images/dashboard.png" alt="PharmaCare Dashboard Overview" width="94%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
   <br/>
   <em>Figure 1: Real-time Analytics Dashboard with financial KPI metrics, monthly revenue trends, and dynamic supplier distribution.</em>
 </p>
@@ -94,7 +94,7 @@ PharmaCare resolves these issues through automated, bidirectional stock synchron
 
 <!-- SCREENSHOT 2: MEDICINE INVENTORY CATALOG -->
 <p align="center">
-  <img src="https://via.placeholder.com/1200x630/1e293b/ffffff?text=+Preview%3A+Medicine+Inventory+Catalog" alt="PharmaCare Inventory Management" width="92%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+  <img src="./Images/inventory.png" alt="PharmaCare Inventory Management" width="94%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
   <br/>
   <em>Figure 2: Real-time Medicine Inventory Catalog with search, status filters, and instant stock update modals.</em>
 </p>
@@ -114,7 +114,7 @@ PharmaCare resolves these issues through automated, bidirectional stock synchron
 
 <!-- SCREENSHOT 3: PURCHASE INTAKE & PROCUREMENT -->
 <p align="center">
-  <img src="https://via.placeholder.com/1200x630/1e293b/ffffff?text=+Preview%3A+Procurement+%26+Purchase+Details" alt="PharmaCare Purchase Details" width="92%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+  <img src="./Images/purchases.png" alt="PharmaCare Purchase Details" width="94%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
   <br/>
   <em>Figure 3: Vendor Procurement Module tracking purchase orders, procurement expenses, and automatic inventory stock intake.</em>
 </p>
@@ -134,7 +134,7 @@ PharmaCare resolves these issues through automated, bidirectional stock synchron
 
 <!-- SCREENSHOT 4: SALES MANAGEMENT & POINT OF SALE -->
 <p align="center">
-  <img src="https://via.placeholder.com/1200x630/1e293b/ffffff?text=+Preview%3A+Sales+Counter+%26+Stock+Deduction" alt="PharmaCare Sales Management" width="92%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+  <img src="./Images/sales.png" alt="PharmaCare Sales Management" width="94%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
   <br/>
   <em>Figure 4: Sales Management interface with automatic inventory deduction and branch transaction logging.</em>
 </p>
@@ -154,7 +154,7 @@ PharmaCare resolves these issues through automated, bidirectional stock synchron
 
 <!-- SCREENSHOT 5: MULTI-STORE BRANCH MANAGEMENT -->
 <p align="center">
-  <img src="https://via.placeholder.com/1200x630/1e293b/ffffff?text=+Preview%3A+Multi-Store+Branch+Management" alt="PharmaCare Store Management" width="92%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+  <img src="./Images/stores.png" alt="PharmaCare Store Management" width="94%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
   <br/>
   <em>Figure 5: Multi-Store Branch Registry supporting distributed pharmacy locations and multi-branch management.</em>
 </p>
@@ -172,6 +172,12 @@ medical-store-management/
 │
 ├── .gitignore                   # Root git protection (node_modules, builds, .env)
 ├── README.md                    # Project presentation & documentation
+├── Images/                      # Visual documentation & application screenshots
+│   ├── dashboard.png
+│   ├── inventory.png
+│   ├── purchases.png
+│   ├── sales.png
+│   └── stores.png
 │
 ├── Backend/                     # Express REST API (Deployed on Vercel Serverless)
 │   ├── controller/              # Business logic & database operations
